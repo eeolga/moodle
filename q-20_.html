@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Õppimisstiilid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        td:first-child {
+            text-align: left;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Õppimisstiilid</h2>
+    <p>Hinnake iga väidet skaalal 1 (täiesti ei nõustu) kuni 5 (täiesti nõus)</p>
+
+    <form id="quizForm">
+        <table id="questionTable">
+            <tr>
+                <th>Skaala</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+        </table>
+        <button type="button" onclick="calculateResults()">Submit</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    // Question set
+    const questions = [
+        { id: 1, text: "Õppimisel eelistan pilte, tabeleid ja diagramme", type: "Visuaalne" },
+        { id: 2, text: "Ma mäletan asju paremini, kui näen neid kirjapanduna", type: "Visuaalne" },
+        { id: 3, text: "Ma kasutan oma mõtete korrastamiseks mõttekaarte või visandeid", type: "Visuaalne" },
+        { id: 4, text: "Saan illustratsioonidega juhistest paremini aru", type: "Visuaalne" },
+        { id: 5, text: "Mulle meeldib kasutada värve ja sümboleid oluliste punktide esiletõstmiseks", type: "Visuaalne" },
+
+        { id: 6, text: "Õpin kõige paremini siis, kui kuulen selgitusi", type: "Auditoorne" },
+        { id: 7, text: "Mulle meeldivad arutelud ja suulised selgitused", type: "Auditoorne" },
+        { id: 8, text: "Ma mäletan asju paremini, kui neid ette loen", type: "Auditoorne" },
+        { id: 9, text: "Mulle meeldib asju suuliselt korrata, et õpitut kinnistada", type: "Auditoorne" },
+        { id: 10, text: "Eelistan lugemisele audioraamatuid", type: "Auditoorne" },
+
+        { id: 11, text: "Mulle meeldib nimekirjade ja struktureeritud märkmete tegemine", type: "Lugemine/Kirjutamine" },
+        { id: 12, text: "Teen uute teemade mõistmiseks detailseid märkmeid", type: "Lugemine/Kirjutamine" },
+        { id: 13, text: "Eelistan õpikuid loengutele", type: "Lugemine/Kirjutamine" },
+        { id: 14, text: "Mulle meeldib lugeda ja infot kokku võtta", type: "Lugemine/Kirjutamine" },
+        { id: 15, text: "Asjade üleskirjutamine aitab mul neid meeles pidada", type: "Lugemine/Kirjutamine" },
+
+        { id: 16, text: "Õpin kõige paremini praktilise kogemuse kaudu", type: "Kinesteetiline" },
+        { id: 17, text: "Eelistan kuulamisele või lugemisele füüsilisi tegevusi", type: "Kinesteetiline" },
+        { id: 18, text: "Mulle meeldib asju valmistada või meisterdada", type: "Kinesteetiline" },
+        { id: 19, text: "Ma saan paremini aru, kui saan materjalidega füüsiliselt tegeleda", type: "Kinesteetiline" },
+        { id: 20, text: "Mulle meeldib rollimängid või ideid läbi mängida", type: "Kinesteetiline" }
+    ];
+
+    // Dynamically populate the table with questions
+    window.onload = function () {
+        const table = document.getElementById("questionTable");
+        questions.forEach(q => {
+            let row = table.insertRow(-1);
+            let cell1 = row.insertCell(0);
+            cell1.innerText = q.text;
+
+            for (let i = 1; i <= 5; i++) {
+                let cell = row.insertCell(i);
+                let input = document.createElement("input");
+                input.type = "radio";
+                input.name = `q${q.id}`;
+                input.value = i;
+                input.required = true;
+                cell.appendChild(input);
+            }
+        });
+    };
+
+    // Calculate results
+    function calculateResults() {
+        let scores = { "Visuaalne": 0, "Auditoorne": 0, "Lugemine/Kirjutamine": 0, "Kinesteetiline": 0 };
+        let form = document.forms["quizForm"];
+        let allAnswered = true;
+
+        questions.forEach(q => {
+            let value = form[`q${q.id}`].value;
+            if (!value) {
+                allAnswered = false;
+            } else {
+                scores[q.type] += parseInt(value);
+            }
+        });
+
+        if (!allAnswered) {
+            alert("Palun vastake enne esitamist kõigile küsimustele");
+            return;
+        }
+
+        let maxScore = Math.max(...Object.values(scores));
+        let dominantStyles = Object.keys(scores).filter(style => scores[style] === maxScore);
+        
+        document.getElementById("result").innerHTML = `
+            <p>Õppestiili arvutus:</p>
+            <p>${Object.entries(scores).map(([style, score]) => `${style}: ${score}`).join("<br>")}</p>
+            <p><strong>Põhiline õppestiil(id): ${dominantStyles.join(", ")}</strong></p>
+        `;
+    }
+</script>
+
+</body>
+</html>
